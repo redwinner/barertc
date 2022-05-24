@@ -100,7 +100,7 @@ all: $(MOD_BINS) $(BIN)
 # GPROF requires static linking
 $(BIN): $(OBJS)
 	@echo "  LD      $@"
-ifneq ($(GPROF),)
+ifneq ($(GPROF) $(RELEASE),)
 	@$(LD) $(LFLAGS) $(APP_LFLAGS) $^ ../re/libre.a $(LIBS) -o $@
 else
 	@$(LD) $(LFLAGS) $(APP_LFLAGS) $^ -L$(LIBRE_SO) -lre $(LIBS) -o $@
