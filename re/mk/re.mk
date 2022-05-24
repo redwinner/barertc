@@ -376,7 +376,7 @@ endif
 
 endif
 
-ifneq ($(strip $(filter __arm64__ ,$(PREDEF))),)
+ifneq ($(strip $(filter __arm64__ __aarch64__, $(PREDEF))),)
 ARCH   := arm64
 endif
 
