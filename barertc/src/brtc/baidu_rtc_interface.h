@@ -24,6 +24,7 @@ void brtc_register_message_listener(void* rtc_client, IRtcMessageListener msgLis
 void brtc_send_message_to_user(void* rtc_client, const char* msg, const char* id);
 void brtc_start_publish(void* rtc_client);
 void brtc_set_auto_publish(void* rtc_client, int auto_publish);
+void brtc_set_auto_subscribe(void* rtc_client, int auto_subscribe);
 
 #ifdef __cplusplus
 }

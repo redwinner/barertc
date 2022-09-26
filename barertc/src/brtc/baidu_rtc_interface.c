@@ -102,6 +102,13 @@ void brtc_set_auto_publish(void* rtc_client, int auto_publish) {
     }
 }
 
+void brtc_set_auto_subscribe(void* rtc_client, int auto_subscribe) {
+    BaiduRtcClient* client = (BaiduRtcClient*)rtc_client;
+    if (client) {
+        client->mAutoSubscribe = auto_subscribe;
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif

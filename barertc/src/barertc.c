@@ -84,6 +84,7 @@ static int brtc_cmd_handler(char obj, const char *d)
             brtc_set_appid(gBrtcClient, appid);
 
             brtc_set_auto_publish(gBrtcClient, 1);
+			brtc_set_auto_subscribe(gBrtcClient, 1);
             if (ret) {
                 printf("brtc_init_sdk success\n");
             } else {
