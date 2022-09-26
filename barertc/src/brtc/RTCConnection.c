@@ -22,7 +22,7 @@ static void RTCConnection_baidurtc_client(void *c, int ev, void *ev_data, void *
     struct FRTCConnection* conn = (struct FRTCConnection*) fn_data;
     if (conn) {
         if (ev == MG_EV_WS_OPEN) {
-            printf("MG_EV_WS_OPEN, conn：%p appId addr:%p, appId: %s, mRoomName addr:%p, mRoomName:%s, mUserId:%p, mUserId:%s\n", 
+            printf("MG_EV_WS_OPEN, conn:%p appId addr:%p, appId: %s, mRoomName addr:%p, mRoomName:%s, mUserId:%p, mUserId:%s\n", 
                 conn, conn->mAppId, conn->mAppId,conn->mRoomName, conn->mRoomName, conn->mUserId, conn->mUserId);
             conn->onRTCOpen(conn);
         } else if (ev == MG_EV_CONNECT) {
