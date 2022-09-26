@@ -11,8 +11,7 @@
 
 
 enum {
-	HTTP_PORT  = 9000,
-	HTTPS_PORT = 9001
+	HTTP_PORT  = 9000
 };
 
 
@@ -263,7 +262,7 @@ static void peerconnection_gather_handler(void *arg)
 
 	err = reply_descr(type, mb_sdp);
 	if (err) {
-		warning("demo: reply error: %m\n", err);
+		warning("barertc: reply error: %m\n", err);
 		goto out;
 	}
 
@@ -271,7 +270,7 @@ static void peerconnection_gather_handler(void *arg)
 
 		err = peerconnection_start_ice(sess->pc);
 		if (err) {
-			warning("demo: failed to start ice (%m)\n", err);
+			warning("barertc: failed to start ice (%m)\n", err);
 			goto out;
 		}
 	}
@@ -287,7 +286,7 @@ static void peerconnection_estab_handler(struct media_track *media, void *arg)
 
 	(void)arg;
 
-	info("demo: stream established: '%s'\n", media_kind_name(media->kind));
+	info("barertc: stream established: '%s'\n", media_kind_name(media->kind));
 
 	switch (media->kind) {
 
@@ -295,14 +294,14 @@ static void peerconnection_estab_handler(struct media_track *media, void *arg)
 		err = mediatrack_start_audio(media, baresip_ausrcl(),
 					     baresip_aufiltl());
 		if (err) {
-			warning("demo: could not start audio (%m)\n", err);
+			warning("barertc: could not start audio (%m)\n", err);
 		}
 		break;
 
 	case MEDIA_KIND_VIDEO:
 		err = mediatrack_start_video(media);
 		if (err) {
-			warning("demo: could not start video (%m)\n", err);
+			warning("barertc: could not start video (%m)\n", err);
 		}
 		break;
 	}
@@ -313,7 +312,7 @@ static void peerconnection_close_handler(int err, void *arg)
 {
 	struct session *sess = arg;
 
-	warning("demo: session closed (%m)\n", err);
+	warning("barertc: session closed (%m)\n", err);
 
 	/* todo: notify client that session was closed */
 	sess->pc = mem_deref(sess->pc);
@@ -327,7 +326,7 @@ static int create_pc(struct session *sess, enum sdp_type type)
 	bool got_offer = (type == SDP_OFFER);
 	int err;
 
-	info("demo: create session (type=%s)\n", sdptype_name(type));
+	info("barertc: create session (type=%s)\n", sdptype_name(type));
 
 	/* create a new session object, send SDP to it */
 	err = peerconnection_new(&sess->pc, &pc_config, got_offer, mnat, menc,
@@ -335,13 +334,13 @@ static int create_pc(struct session *sess, enum sdp_type type)
 				 peerconnection_estab_handler,
 				 peerconnection_close_handler, sess);
 	if (err) {
-		warning("demo: session alloc failed (%m)\n", err);
+		warning("barertc: session alloc failed (%m)\n", err);
 		goto out;
 	}
 
 	err = peerconnection_add_audio(sess->pc, config, baresip_aucodecl());
 	if (err) {
-		warning("demo: add_audio failed (%m)\n", err);
+		warning("barertc: add_audio failed (%m)\n", err);
 		goto out;
 	}
 
@@ -362,7 +361,7 @@ static int handle_post_sdp(struct session *sess, const struct http_msg *msg)
 	bool got_offer = false;
 	int err = 0;
 
-	info("demo: handle POST sdp: content is '%r/%r'\n",
+	info("barertc: handle POST sdp: content is '%r/%r'\n",
 	     &msg->ctyp.type, &msg->ctyp.subtype);
 
 	if (msg->clen) {
@@ -382,20 +381,20 @@ static int handle_post_sdp(struct session *sess, const struct http_msg *msg)
 				err = peerconnection_set_remote_descr(sess->pc,
 								      &sd);
 				if (err) {
-					warning("demo: set remote descr error"
+					warning("barertc: set remote descr error"
 						" (%m)\n", err);
 					goto out;
 				}
 
 				err = peerconnection_start_ice(sess->pc);
 				if (err) {
-					warning("demo: failed to start ice"
+					warning("barertc: failed to start ice"
 						" (%m)\n", err);
 					goto out;
 				}
 			}
 			else {
-				warning("demo: invalid session description"
+				warning("barertc: invalid session description"
 					" type:"
 					" %s\n",
 					sdptype_name(sd.type));
@@ -420,7 +419,7 @@ static int handle_post_sdp(struct session *sess, const struct http_msg *msg)
 
 			err = peerconnection_set_remote_descr(sess->pc, &sd);
 			if (err) {
-				warning("demo: decode offer failed (%m)\n",
+				warning("barertc: decode offer failed (%m)\n",
 					err);
 				goto out;
 			}
@@ -451,7 +450,7 @@ static void handle_get(struct http_conn *conn, const struct pl *path)
 
 	err = load_file(mb, buf);
 	if (err) {
-		info("demo: not found: %s\n", buf);
+		info("barertc: not found: %s\n", buf);
 		http_ereply(conn, 404, "Not Found");
 		goto out;
 	}
@@ -459,7 +458,7 @@ static void handle_get(struct http_conn *conn, const struct pl *path)
 	ext = file_extension(buf);
 	mime = extension_to_mimetype(ext);
 
-	info("demo: loaded file '%s', %zu bytes (%s)\n", buf, mb->end, mime);
+	info("barertc: loaded file '%s', %zu bytes (%s)\n", buf, mb->end, mime);
 
 	http_reply(conn, 200, "OK",
 		   "Content-Type: %s;charset=UTF-8\r\n"
@@ -486,7 +485,7 @@ static void http_req_handler(struct http_conn *conn,
     char b[50];
 	(void)arg;
 
-	info("demo: request: met=%r, path=%r, prm=%r\n",
+	info("barertc: request: met=%r, path=%r, prm=%r\n",
 	     &msg->met, &msg->path, &msg->prm);
 
 	if (msg->path.l > 1)
@@ -503,13 +502,11 @@ static void http_req_handler(struct http_conn *conn,
             strncpy(appid, &data.p[7], data.l - 7);
             brtc_cmd_handler('c', "");
             brtc_cmd_handler('i', "");
-		    err = session_new(&sess);
 
             http_reply(conn, 200, "OK",
                     "Content-Length: 2\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
-                    "Session-ID: %s\r\n"
-                    "\r\nok", sess->id);
+                    "\r\nok");
         } else if (0 == pl_strcasecmp(&path, "/start")) {
             brtc_cmd_handler('s', "");
         } else if (0 == pl_strcasecmp(&path, "/stop")) {
@@ -554,7 +551,7 @@ static void http_req_handler(struct http_conn *conn,
 
 		hdr = http_msg_xhdr(msg, "Session-ID");
 		if (!hdr) {
-			warning("demo: no Session-ID header\n");
+			warning("barertc: no Session-ID header\n");
 			err = EPROTO;
 			goto out;
 		}
@@ -572,7 +569,7 @@ static void http_req_handler(struct http_conn *conn,
 			conn_pending = mem_ref(conn);
 		}
 		else {
-			warning("demo: sdp: session not found (%r)\n",
+			warning("barertc: sdp: session not found (%r)\n",
 				&hdr->val);
 			http_ereply(conn, 404, "Session Not Found");
 			return;
@@ -583,18 +580,18 @@ static void http_req_handler(struct http_conn *conn,
 
 		const struct http_hdr *hdr;
 
-		info("demo: disconnect\n");
+		info("barertc: disconnect\n");
 
 		hdr = http_msg_xhdr(msg, "Session-ID");
 		if (!hdr) {
-			warning("demo: no Session-ID header\n");
+			warning("barertc: no Session-ID header\n");
 			err = EPROTO;
 			goto out;
 		}
 
 		sess = session_lookup(&hdr->val);
 		if (sess) {
-			info("demo: closing session %s\n", sess->id);
+			info("barertc: closing session %s\n", sess->id);
 			mem_deref(sess);
 
 			http_reply(conn, 200, "OK",
@@ -603,13 +600,13 @@ static void http_req_handler(struct http_conn *conn,
 				   "\r\n");
 		}
 		else {
-			warning("demo: session not found (%r)\n", &hdr->val);
+			warning("barertc: session not found (%r)\n", &hdr->val);
 			http_ereply(conn, 404, "Session Not Found");
 			return;
 		}
 	}
 	else {
-		warning("demo: not found: %r %r\n", &msg->met, &msg->path);
+		warning("barertc: not found: %r %r\n", &msg->met, &msg->path);
 		http_ereply(conn, 404, "Not Found");
 	}
 
@@ -632,7 +629,7 @@ int demo_init(const char *ice_server,
 
 		err = stunuri_decode(&pc_config.ice_server, &srv);
 		if (err) {
-			warning("demo: invalid iceserver '%r' (%m)\n",
+			warning("barertc: invalid iceserver '%r' (%m)\n",
 				&srv, err);
 			return err;
 		}
@@ -643,24 +640,23 @@ int demo_init(const char *ice_server,
 
 	mnat = mnat_find(baresip_mnatl(), "ice");
 	if (!mnat) {
-		warning("demo: medianat 'ice' not found\n");
+		warning("barertc: medianat 'ice' not found\n");
 		return ENOENT;
 	}
 
 	menc = menc_find(baresip_mencl(), "dtls_srtp");
 	if (!menc) {
-		warning("demo: mediaenc 'dtls_srtp' not found\n");
+		warning("barertc: mediaenc 'dtls_srtp' not found\n");
 		return ENOENT;
 	}
 
 	menc_srtp = menc_find(baresip_mencl(), "srtp-rtp");
 	if (!menc) {
-		warning("demo: mediaenc 'srtp-rtp' not found\n");
+		warning("barertc: mediaenc 'srtp-rtp' not found\n");
 		return ENOENT;
 	}
 
 	sa_set_str(&laddr, "0.0.0.0", http_port);
-	sa_set_str(&laddrs, "0.0.0.0", HTTPS_PORT);
 
 	err = http_listen(&httpsock, &laddr, http_req_handler, NULL);
 	if (err)
@@ -671,9 +667,8 @@ int demo_init(const char *ice_server,
 	if (err)
 		return err;
 
-	info("demo: listening on:\n");
+	info("barertc: listening on:\n");
 	info("    http://localhost:%u/\n", sa_port(&laddr));
-	info("    https://localhost:%u/\n", sa_port(&laddrs));
 
 	return 0;
 }
