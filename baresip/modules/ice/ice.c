@@ -29,7 +29,7 @@ struct mnat_sess {
 	struct stun_dns *dnsq;
 	struct sdp_session *sdp;
 	struct tmr tmr_async;
-	char lufrag[8];
+	char lufrag[5];
 	char lpwd[32];
 	uint64_t tiebrk;
 	bool turn;

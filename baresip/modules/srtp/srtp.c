@@ -182,7 +182,19 @@ static int start_srtp(struct menc_st *st, const char *suite_name)
 	}
 
 	/* use SRTP for this stream/session */
-	st->use_srtp = true;
+	st->use_srtp = false;
+	char buf[64] = "";
+	if (st->sess->eventh) {
+		if (re_snprintf(buf, sizeof(buf), "%s,%s",
+				sdp_media_name(st->sdpm),
+				st->crypto_suite))
+			st->sess->eventh(MENC_EVENT_SECURE, buf,
+					 (struct stream *)st->strm,
+					 st->sess->arg);
+		else
+			warning("srtp: failed to print secure"
+				" event arguments\n");
+	}
 
 	return 0;
 }
@@ -228,8 +240,10 @@ static bool recv_handler(struct sa *src, struct mbuf *mb, void *arg)
 	if (!st->got_sdp)
 		return true;  /* drop the packet */
 
-	if (!st->use_srtp || !is_rtp_or_rtcp(mb))
+	if (!is_rtp_or_rtcp(mb))
 		return false;
+
+	return false;
 
 	if (is_rtcp_packet(mb)) {
 		err = srtcp_decrypt(st->srtp_rx, mb);
@@ -444,8 +458,8 @@ static int media_alloc(struct menc_media **stp, struct menc_sess *sess,
 		}
 	}
 
-	if (!rattr)
-		err = sdp_enc(st, sdpm, 1, st->crypto_suite);
+	// if (!rattr)
+	// 	err = sdp_enc(st, sdpm, 1, st->crypto_suite);
 
  out:
 	if (err)
@@ -478,6 +492,13 @@ static struct menc menc_srtp_mandf = {
 	.mediah    = media_alloc
 };
 
+static struct menc menc_srtp_raw_rtp = {
+	.id        = "srtp-rtp",
+	.sdp_proto = "RTP/AVP",
+	.sessh     = session_alloc,
+	.mediah    = media_alloc
+};
+
 
 static int mod_srtp_init(void)
 {
@@ -486,6 +507,7 @@ static int mod_srtp_init(void)
 	menc_register(mencl, &menc_srtp_opt);
 	menc_register(mencl, &menc_srtp_mand);
 	menc_register(mencl, &menc_srtp_mandf);
+	menc_register(mencl, &menc_srtp_raw_rtp);
 
 	return 0;
 }
