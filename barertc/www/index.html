@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="BRTC Lite demo">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="BRTC Lite demo">
+    <meta itemprop="name" content="BRTC Lite demo">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>BRTC Lite demo</title>
+
+
+</head>
+
+<body>
+
+<div id="container">
+
+    <h1>BRTC Lite Demo
+    </h1>
+
+    <div id="buttons">
+        <button id="connectButton">Connect</button>
+        <button id="disconnectButton">Disconnect</button>
+    </div>
+
+    <hr>
+
+    <div id="audio">
+        <div>
+            <div class="label">Remote audio:</div>
+            <audio id="audio" autoplay controls></audio>
+        </div>
+    </div>
+
+    <video id="remoteVideo" playsinline autoplay></video>
+
+</div>
+
+<hr>
+<script src="js/adapter-latest.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
