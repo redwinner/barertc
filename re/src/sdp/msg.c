@@ -85,6 +85,25 @@ static int attr_decode_rtpmap(struct sdp_media *m, const struct pl *pl)
 	return 0;
 }
 
+static int candidate_decode(struct sdp_media *m, const struct pl *pl)
+{
+	struct pl foundation, compid, transp, prio, addr, port, cand_type;
+	struct pl extra = pl_null;
+	int err;
+
+	err = re_regex(pl->p, pl->l,
+		       "[^ ]+ [0-9]+ [^ ]+ [0-9]+ [^ ]+ [0-9]+ typ [a-z]+[^]*",
+		       &foundation, &compid, &transp, &prio,
+		       &addr, &port, &cand_type, &extra);
+	if (err)
+		return EBADMSG;
+
+    if (sa_port(&m->raddr) == 9) { // if is 9 update the port.
+    	sa_set_port(&m->raddr, m->uproto ? 0 : pl_u32(&port));
+    }
+
+	return 0;
+}
 
 static int attr_decode(struct sdp_session *sess, struct sdp_media *m,
 		       enum sdp_dir *dir, const struct pl *pl)
@@ -96,6 +115,10 @@ static int attr_decode(struct sdp_session *sess, struct sdp_media *m,
 		name = *pl;
 		val  = pl_null;
 	}
+
+    if (!pl_strcmp(&name, "candidate")) { //extract candidate port
+    	(void)candidate_decode(m, &val);
+    }
 
 	if (!pl_strcmp(&name, "fmtp"))
 		err = attr_decode_fmtp(m, &val);
@@ -378,6 +401,7 @@ static int media_encode(const struct sdp_media *m, struct mbuf *mb, bool offer)
 		port = sa_port(&m->laddr);
 		proto = m->proto;
 	}
+	port = 9; //using 9 for port.
 
 	err = mbuf_printf(mb, "m=%s %u %s", m->name, port, proto);
 
@@ -445,6 +469,7 @@ static int media_encode(const struct sdp_media *m, struct mbuf *mb, bool offer)
 
 	err |= mbuf_printf(mb, "a=%s\r\n",
 			   sdp_dir_name(offer ? m->ldir : m->ldir & m->rdir));
+	err |= mbuf_printf(mb, "a=mid:0\r\n");
 
 	for (le = m->lattrl.head; le; le = le->next)
 		err |= mbuf_printf(mb, "%H", sdp_attr_print, le->data);
@@ -470,7 +495,7 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 	const int ipver = sa_af(&sess->laddr) == AF_INET ? 4 : 6;
 	enum sdp_bandwidth i;
 	struct mbuf *mb;
-	struct le *le;
+	struct le *le, *le2;
 	int err;
 
 	if (!mbp || !sess)
@@ -496,9 +521,8 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 	}
 
 	err |= mbuf_write_str(mb, "t=0 0\r\n");
-
-	for (le = sess->lattrl.head; le; le = le->next)
-		err |= mbuf_printf(mb, "%H", sdp_attr_print, le->data);
+	err |= mbuf_write_str(mb, "a=group:BUNDLE 0\r\n");
+	err |= mbuf_write_str(mb, "a=msid-semantic: WMS\r\n");
 
 	for (le=sess->lmedial.head; offer && le;) {
 
@@ -518,6 +542,8 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 		struct sdp_media *m = le->data;
 
 		err |= media_encode(m, mb, offer);
+		for (le2 = sess->lattrl.head; le2; le2 = le2->next)
+			err |= mbuf_printf(mb, "%H", sdp_attr_print, le2->data);
 	}
 
 	mb->pos = 0;

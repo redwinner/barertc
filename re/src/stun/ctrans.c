@@ -125,6 +125,15 @@ static void udp_recv_handler(const struct sa *src, struct mbuf *mb, void *arg)
 	(void)stun_recv(stun, mb);
 }
 
+static bool udp_recv_handler_helper(struct sa *src, struct mbuf *mb, void *arg)
+{
+	struct stun *stun = arg;
+	(void)src;
+	if (mb && (mb->buf[0] & 0xc0)) { //rtp or rtcp.
+		return false;
+	}
+	return !stun_recv(stun, mb);
+}
 
 static void tcp_recv_handler(struct mbuf *mb, void *arg)
 {
@@ -276,6 +285,8 @@ int stun_ctrans_request(struct stun_ctrans **ctp, struct stun *stun, int proto,
 					 udp_recv_handler, stun);
 			if (err)
 				break;
+		} else {
+			udp_register_helper(NULL, ct->sock, 5, NULL, udp_recv_handler_helper, stun);
 		}
 
 		ct->txc = 1;
