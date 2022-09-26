@@ -9,18 +9,11 @@
 #include <baresip.h>
 #include "barertc.h"
 
-
-enum {
-	HTTP_PORT  = 9000
-};
-
-
 struct session {
 	struct le le;
 	struct peer_connection *pc;
 	char *id;
 };
-
 
 static struct http_sock *httpsock;
 static struct http_sock *httpssock;
@@ -193,7 +186,7 @@ static void reply_fmt(struct http_conn *conn, const char *ctype,
 	if (err)
 		return;
 
-	info("demo: reply: %s\n", ctype);
+	info("barertc: reply: %s\n", ctype);
 
 	http_reply(conn, 200, "OK",
 		   "Content-Type: %s\r\n"
@@ -251,7 +244,7 @@ static void peerconnection_gather_handler(void *arg)
 	ss = peerconnection_signaling(sess->pc);
 	type = (ss != SS_HAVE_REMOTE_OFFER) ? SDP_OFFER : SDP_ANSWER;
 
-	info("demo: session gathered -- send %s\n", sdptype_name(type));
+	info("barertc: session gathered -- send %s\n", sdptype_name(type));
 
 	if (type == SDP_OFFER)
 		err = peerconnection_create_offer(sess->pc, &mb_sdp);

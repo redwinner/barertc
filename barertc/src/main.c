@@ -12,11 +12,13 @@
 #include <baresip.h>
 #include "barertc.h"
 
-
-#define DEBUG_MODULE "baresip-webrtc"
+#define DEBUG_MODULE "barertc"
 #define DEBUG_LEVEL 6
 #include <re_dbg.h>
 
+enum {
+	HTTP_PORT  = 9000
+};
 
 static const char *modpath = "/usr/local/lib/baresip/modules";
 
@@ -56,7 +58,7 @@ static void signal_handler(int signum)
 static void usage(void)
 {
 	re_fprintf(stderr,
-		   "Usage: baresip-webrtc [options]\n"
+		   "Usage: barertc [options]\n"
 		   "\n"
 		   "options:\n"
                    "\t-h               Help\n"
@@ -78,7 +80,7 @@ int main(int argc, char *argv[])
 	const char *stun_user = NULL, *stun_pass = NULL;
 	size_t i;
 	int err = 0;
-        int http_port = 9000;
+    int http_port = HTTP_PORT;
 
 	for (;;) {
 
