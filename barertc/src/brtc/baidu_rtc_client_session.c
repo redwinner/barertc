@@ -110,7 +110,7 @@ int client_session_create_offer(struct client_session *sess, enum sdp_type type)
 
 	err = reply_descr(sess, type, mb_sdp);
 	if (err) {
-		warning("demo: reply error: %m\n", err);
+		warning("clientsession: reply error: %m\n", err);
 		goto out;
 	}
 
@@ -200,7 +200,7 @@ static void peerconnection_gather_handler(void *arg)
 	ss = peerconnection_signaling(sess->pc);
 	type = (ss != SS_HAVE_REMOTE_OFFER) ? SDP_OFFER : SDP_ANSWER;
 
-	info("demo: session gathered -- send %s\n", sdptype_name(type));
+	info("clientsession: session gathered -- send %s\n", sdptype_name(type));
 /*
 	if (type == SDP_OFFER)
 		err = peerconnection_create_offer(sess->pc, &mb_sdp);
@@ -211,7 +211,7 @@ static void peerconnection_gather_handler(void *arg)
 
 	err = reply_descr(arg, type, mb_sdp);
 	if (err) {
-		warning("demo: reply error: %m\n", err);
+		warning("clientsession: reply error: %m\n", err);
 		goto out;
 	}*/
 
@@ -219,7 +219,7 @@ static void peerconnection_gather_handler(void *arg)
 
 		err = peerconnection_start_ice(sess->pc);
 		if (err) {
-			warning("demo: failed to start ice (%m)\n", err);
+			warning("clientsession: failed to start ice (%m)\n", err);
 			//goto out;
 		}
 	// }
@@ -235,7 +235,7 @@ static void peerconnection_estab_handler(struct media_track *media, void *arg)
 
 	(void)arg;
 
-	info("demo: stream established: '%s'\n", media_kind_name(media->kind));
+	info("clientsession: stream established: '%s'\n", media_kind_name(media->kind));
 
 	switch (media->kind) {
 
@@ -243,14 +243,14 @@ static void peerconnection_estab_handler(struct media_track *media, void *arg)
 		err = mediatrack_start_audio(media, baresip_ausrcl(),
 					     baresip_aufiltl());
 		if (err) {
-			warning("demo: could not start audio (%m)\n", err);
+			warning("clientsession: could not start audio (%m)\n", err);
 		}
 		break;
 
 	case MEDIA_KIND_VIDEO:
 		err = mediatrack_start_video(media);
 		if (err) {
-			warning("demo: could not start video (%m)\n", err);
+			warning("clientsession: could not start video (%m)\n", err);
 		}
 		break;
 	}
@@ -261,7 +261,7 @@ static void peerconnection_close_handler(int err, void *arg)
 {
 	struct client_session *sess = arg;
 
-	warning("demo: session closed (%m)\n", err);
+	warning("clientsession: session closed (%m)\n", err);
 
 	/* todo: notify client that session was closed */
 	sess->pc = mem_deref(sess->pc);
@@ -283,19 +283,19 @@ int client_session_create_pc(struct client_session *sess, enum sdp_type type)
 				 peerconnection_estab_handler,
 				 peerconnection_close_handler, sess);
 	if (err) {
-		warning("demo: session alloc failed (%m)\n", err);
+		warning("clientsession: session alloc failed (%m)\n", err);
 		goto out;
 	}
 
 	err = peerconnection_add_audio(sess->pc, config, baresip_aucodecl());
 	if (err) {
-		warning("demo: add_audio failed (%m)\n", err);
+		warning("clientsession: add_audio failed (%m)\n", err);
 		goto out;
 	}
 
 	//err = peerconnection_add_video(sess->pc, config, baresip_vidcodecl());
 	//if (err) {
-	//	warning("demo: add_video failed (%m)\n", err);
+	//	warning("clientsession: add_video failed (%m)\n", err);
 	//	goto out;
 	//}
 
@@ -316,7 +316,7 @@ int client_session_set_remote_description(struct client_session *sess, struct mb
     err = peerconnection_set_remote_descr(sess->pc,
                             &sd);
     if (err) {
-        warning("demo: set remote descr error"
+        warning("clientsession: set remote descr error"
             " (%m)\n", err);
         goto out;
     }
@@ -324,7 +324,7 @@ int client_session_set_remote_description(struct client_session *sess, struct mb
     // if (sd.type == SDP_ANSWER) {
     //     err = peerconnection_start_ice(sess->pc);
     //     if (err) {
-    //         warning("demo: failed to start ice"
+    //         warning("clientsession: failed to start ice"
     //             " (%m)\n", err);
     //         goto out;
     //     }
