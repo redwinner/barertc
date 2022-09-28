@@ -73,8 +73,8 @@ static void usage(void)
 		   ice_server);
 }
 
-
-int main(int argc, char *argv[])
+int main_barertc(int argc, char *argv[]);
+int main_barertc(int argc, char *argv[])
 {
 	struct config *config;
 	const char *stun_user = NULL, *stun_pass = NULL;
@@ -214,4 +214,9 @@ int main(int argc, char *argv[])
 	mem_debug();
 
 	return err;
+}
+
+int main(int argc, char *argv[])
+{
+	return main_barertc(argc, argv);
 }
