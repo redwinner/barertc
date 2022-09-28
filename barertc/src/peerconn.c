@@ -3,8 +3,6 @@
  *
  *
  */
-
-#include <string.h>
 #include <re.h>
 #include <baresip.h>
 #include "barertc.h"
