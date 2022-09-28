@@ -1,16 +1,15 @@
 ﻿#ifndef BRTC_RTC_CLIENT_SESSION_H_
 #define BRTC_RTC_CLIENT_SESSION_H_
 
-#include "baidu_rtc_common_define.h"
-#include "baidu_rtc_signal_client.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <string.h>
 #include <re.h>
 #include <baresip.h>
+
+#include "baidu_rtc_common_define.h"
+#include "baidu_rtc_signal_client.h"
 
 #include "../barertc.h"
 

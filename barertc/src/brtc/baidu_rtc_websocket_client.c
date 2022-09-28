@@ -1,4 +1,13 @@
 #include "baidu_rtc_websocket_client.h"
+#include "mongoose.h"
+
+typedef struct baidurtc_context
+{
+    void * ctx;
+    volatile int exit_flag;
+    const char *ca_path;
+    struct mg_mgr mgr;        // Event manager
+} baidurtc_context;
 
 void* brtc_websocket_init_context(const char *ca_path)
 {
