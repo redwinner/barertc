@@ -1,8 +1,5 @@
 #include "baidu_rtc_client_session.h"
 
-#include "baidu_rtc_common_define.h"
-#include "baidu_rtc_signal_client.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
