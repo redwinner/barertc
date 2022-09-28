@@ -610,7 +610,7 @@ static void http_req_handler(struct http_conn *conn,
 }
 
 
-int demo_init(const char *ice_server,
+int barertcdemo_init(const char *ice_server,
 	      const char *stun_user, const char *credential,
 	      int http_port)
 {
@@ -668,7 +668,7 @@ int demo_init(const char *ice_server,
 }
 
 
-void demo_close(void)
+void barertcdemo_close(void)
 {
 	list_flush(&sessl);
 

@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	/* override default config */
 	config->avt.rtcp_mux = true;
 
-	err = demo_init(ice_server, stun_user, stun_pass, http_port);
+	err = barertcdemo_init(ice_server, stun_user, stun_pass, http_port);
 	if (err) {
 		re_fprintf(stderr, "failed to init demo: %m\n", err);
 		goto out;
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 	re_printf("Bye for now\n");
 
  out:
-	demo_close();
+	barertcdemo_close();
 
 	/* note: must be done before mod_close() */
 	module_app_unload();

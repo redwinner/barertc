@@ -84,10 +84,10 @@ const char *extension_to_mimetype(const char *ext);
  * Demo
  */
 
-int  demo_init(const char *ice_server,
+int  barertcdemo_init(const char *ice_server,
 	       const char *stun_user, const char *stun_pass,
 	       int http_port);
-void demo_close(void);
+void barertcdemo_close(void);
 
 
 /*
