@@ -542,9 +542,10 @@ void onRTCError(void* handle, int error_code, char* error) {
         g_client->mRtcMessageListener(&msg);
     }
 }
-
+volatile int g_exit = 0;
 void keepAlive_thread(void* arg) {
     int i = 0;
+    g_exit = 0;
     struct BaiduRtcClient* client = (struct BaiduRtcClient*) arg;
     if (!client || !client->mFRTCconn || !client->mFRTCconn->mWSCtx || !client->mFRTCconn->mWSConnetion) {
         uart_printf(" %s: client(%p), mFRTCconn(%p), mWSCtx(%p), mWSConnetion(%p) is NULL!\n",
@@ -564,6 +565,10 @@ void keepAlive_thread(void* arg) {
         client->mFRTCconn->keepAlive(client->mFRTCconn);
         for (i = 0; i < KEEPALIVE_CNT; i++) {
             brtc_websocket_timer_poll(client->mFRTCconn->mWSCtx, TIMER_POLL);
+            if (g_exit) {
+                uart_printf("keepAlive_thread exit\n");
+                return;
+            }
         }
         if (!client->mFRTCconn->mbAliving) {
             client->mFRTCconn->mObserver->onRTCConnectError(client->mFRTCconn->mObserver->handle);
@@ -766,6 +771,7 @@ bool logoutRoom(struct BaiduRtcClient* client) {
     brtc_hangup_sip();*/
     if (client->mFRTCconn->mRTCConnected) {
         client->mFRTCconn->disconnect(client->mFRTCconn);
+        g_exit = 1;
     }
 
     if (client->mIsLoginRoom) {
