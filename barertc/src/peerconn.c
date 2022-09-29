@@ -664,7 +664,7 @@ void peerconnection_start_media(const struct peer_connection *pc)
         {
             strm = audio_strm(media->u.au);
         } else {
-            strm = audio_strm(media->u.vid);
+            strm = video_strm(media->u.vid);
         }
 
         stream_set_secure(strm, true);
