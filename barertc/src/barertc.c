@@ -520,8 +520,8 @@ static void http_req_handler(struct http_conn *conn,
                            str_ncpy(roomname, &data.p[i + 1], 29);
                        }
                     }
-                    if (i > 8) {
-                       if (!strncmp(&data.p[i - 7], "display", 7)) {
+                    if (i > 10) {
+                       if (!strncmp(&data.p[i - 11], "displayname", 11)) {
                            str_ncpy(display, &data.p[i + 1], 29);
                        }
                     }
