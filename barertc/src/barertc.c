@@ -30,7 +30,11 @@ static struct list sessl;
 #include "brtc/baidu_rtc_interface.h"
 static void* gBrtcClient = NULL;
 
-static char appid[50];
+static char appid[20];
+static char roomname[30] = "2131";
+static char userid[20] = "10001";
+static char display[30] = "BRTC RTOS V3.0 demo";
+static char token[60] = "no_token";
 
 const char *s_url = "ws://rtc.exp.bcelive.com:8186/janus"; // "wss://rtc.exp.bcelive.com/janus"
                                                         // or "ws://183.194.218.96:8188/janus";
@@ -94,7 +98,7 @@ static int brtc_cmd_handler(char obj, const char *d)
 
     } else if(obj == 'i') {
         if (gBrtcClient) {
-            ret = brtc_login_room(gBrtcClient, "2131", "10001", "BRTC RTOS V3.0 demo", "no_token");
+            ret = brtc_login_room(gBrtcClient, roomname, userid, display, token);
             if (ret) {
                 printf("brtc_login_room success\n");
             } else {
@@ -476,6 +480,7 @@ static void http_req_handler(struct http_conn *conn,
 	struct pl path = PL("/index.html");
 	struct session *sess;
 	int err = 0;
+    int i = 0;
     char b[50];
 	(void)arg;
 
@@ -493,7 +498,36 @@ static void http_req_handler(struct http_conn *conn,
             if (msg->prm.l > 1)
                 data = msg->prm;
 
-            strncpy(appid, &data.p[7], data.l - 7);
+            for (i = 0; i < data.l; i ++) {
+                if (data.p[i] == '&') {
+                    *(char *)&data.p[i] = '\0';
+                }
+            }
+            *(char *)&data.p[data.l] = '\0';
+            for (i = 0; i < data.l; i ++) {
+                if (data.p[i] == '=') {
+                    if (i > 5) {
+                       if (!strncmp(&data.p[i - 5], "appid", 5)) {
+                           str_ncpy(appid, &data.p[i + 1], 19);
+                       } else if (!strncmp(&data.p[i - 5], "token", 5)) {
+                           str_ncpy(token, &data.p[i + 1], 59);
+                       } else if (!strncmp(&data.p[i - 6], "userid", 6)) {
+                           str_ncpy(token, &data.p[i + 1], 20);
+                       }
+                    }
+                    if (i > 9) {
+                       if (!strncmp(&data.p[i - 8], "roomname", 8)) {
+                           str_ncpy(roomname, &data.p[i + 1], 29);
+                       }
+                    }
+                    if (i > 8) {
+                       if (!strncmp(&data.p[i - 7], "display", 7)) {
+                           str_ncpy(display, &data.p[i + 1], 29);
+                       }
+                    }
+                }
+            }
+            // strncpy(appid, &data.p[7], data.l - 7);
             brtc_cmd_handler('c', "");
             brtc_cmd_handler('i', "");
 
