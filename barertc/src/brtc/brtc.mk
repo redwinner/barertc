@@ -1,7 +1,7 @@
 #
 # srcs.mk All application source files.
 #
-# Copyright (C) 2010 Alfred E. Heggestad
+# Copyright (C) 2022 baidu.com
 #
 
 SRCS	+= brtc/baidu_rtc_interface.c
