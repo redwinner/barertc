@@ -36,7 +36,7 @@ static char userid[20] = "10001";
 static char display[30] = "BRTC RTOS V3.0 demo";
 static char token[60] = "no_token";
 
-const char *s_url = "ws://rtc.exp.bcelive.com:8186/janus"; // "wss://rtc.exp.bcelive.com/janus"
+static char brtcserver[125] = "ws://rtc.exp.bcelive.com:8186/janus"; // "wss://rtc.exp.bcelive.com/janus"
                                                         // or "ws://183.194.218.96:8188/janus";
 														// "ws://rtc-old-sandbox.acgrtc.com:8188/janus";
 
@@ -84,7 +84,7 @@ static int brtc_cmd_handler(char obj, const char *d)
 
             ret = brtc_init_client(gBrtcClient);
             brtc_set_cer(gBrtcClient, ca_info);
-            brtc_set_server_url(gBrtcClient, s_url);
+            brtc_set_server_url(gBrtcClient, brtcserver);
             brtc_set_appid(gBrtcClient, appid);
 
             brtc_set_auto_publish(gBrtcClient, 1);
@@ -515,9 +515,14 @@ static void http_req_handler(struct http_conn *conn,
                            str_ncpy(token, &data.p[i + 1], 20);
                        }
                     }
-                    if (i > 9) {
+                    if (i > 7) {
                        if (!strncmp(&data.p[i - 8], "roomname", 8)) {
                            str_ncpy(roomname, &data.p[i + 1], 29);
+                       }
+                    }
+					if (i > 9) {
+                       if (!strncmp(&data.p[i - 10], "brtcserver", 10)) {
+                           str_ncpy(brtcserver, &data.p[i + 1], 124);
                        }
                     }
                     if (i > 10) {
