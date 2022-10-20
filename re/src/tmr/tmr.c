@@ -210,7 +210,7 @@ uint64_t tmr_next_timeout(struct list *tmrl)
 	if (tmr->jfs <= jif)
 		return 1;
 	else
-		return tmr->jfs - jif;
+		return (tmr->jfs - jif < 2000) ? (tmr->jfs - jif) : 2000; // too large will later 
 }
 
 
