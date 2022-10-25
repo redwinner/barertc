@@ -473,7 +473,7 @@ static void handle_get(struct http_conn *conn, const struct pl *path)
 	mem_deref(buf);
 }
 
-
+static  char b[50];
 static void http_req_handler(struct http_conn *conn,
 			     const struct http_msg *msg, void *arg)
 {
@@ -481,7 +481,6 @@ static void http_req_handler(struct http_conn *conn,
 	struct session *sess;
 	int err = 0;
     int i = 0;
-    char b[50];
 	(void)arg;
 
 	info("barertc: request: met=%r, path=%r, prm=%r\n",
@@ -552,6 +551,7 @@ static void http_req_handler(struct http_conn *conn,
             if (msg->prm.l > 1)
                 data = msg->prm;
 
+            memset(b, 0, sizeof(b));
             strncpy(b, data.p, data.l);
 
             brtc_cmd_handler('m', &b[3]);
