@@ -511,7 +511,7 @@ static void http_req_handler(struct http_conn *conn,
                        } else if (!strncmp(&data.p[i - 5], "token", 5)) {
                            str_ncpy(token, &data.p[i + 1], 59);
                        } else if (!strncmp(&data.p[i - 6], "userid", 6)) {
-                           str_ncpy(token, &data.p[i + 1], 20);
+                           str_ncpy(userid, &data.p[i + 1], 20);
                        }
                     }
                     if (i > 7) {
