@@ -473,7 +473,7 @@ static void handle_get(struct http_conn *conn, const struct pl *path)
 	mem_deref(buf);
 }
 
-static  char b[50];
+static char g_data_buf[128];
 static void http_req_handler(struct http_conn *conn,
 			     const struct http_msg *msg, void *arg)
 {
@@ -536,9 +536,9 @@ static void http_req_handler(struct http_conn *conn,
             brtc_cmd_handler('i', "");
 
             http_reply(conn, 200, "OK",
-                    "Content-Length: 2\r\n"
+                    "Content-Length: 8\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
-                    "\r\nok");
+                    "\r\nlogin ok");
         } else if (0 == pl_strcasecmp(&path, "/start")) {
             brtc_cmd_handler('s', "");
         } else if (0 == pl_strcasecmp(&path, "/stop")) {
@@ -551,14 +551,14 @@ static void http_req_handler(struct http_conn *conn,
             if (msg->prm.l > 1)
                 data = msg->prm;
 
-            memset(b, 0, sizeof(b));
-            strncpy(b, data.p, data.l);
+            memset(g_data_buf, 0, sizeof(g_data_buf));
+            strncpy(g_data_buf, data.p, data.l);
 
-            brtc_cmd_handler('m', &b[3]);
+            brtc_cmd_handler('m', &g_data_buf[3]);
             http_reply(conn, 200, "OK",
-                    "Content-Length: 2\r\n"
+                    "Content-Length: 10\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
-                    "\r\nok");
+                    "\r\nsendmsg ok");
         } else {
             handle_get(conn, &path);
         }

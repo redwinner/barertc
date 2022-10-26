@@ -566,7 +566,7 @@ void keepAlive_thread(void* arg) {
         for (i = 0; i < KEEPALIVE_CNT; i++) {
             brtc_websocket_timer_poll(client->mFRTCconn->mWSCtx, TIMER_POLL);
             if (g_exit) {
-                uart_printf("keepAlive_thread exit\n");
+                uart_printf("keepAlive_thread exit 1\n");
                 return;
             }
         }
@@ -576,7 +576,7 @@ void keepAlive_thread(void* arg) {
             return;
         }
     }
-    uart_printf("keepAlive_thread exit\n");
+    uart_printf("keepAlive_thread exit 0\n");
 }
 
 static bool init(struct BaiduRtcClient* client) {
