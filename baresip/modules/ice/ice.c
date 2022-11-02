@@ -535,7 +535,7 @@ static int session_alloc(struct mnat_sess **sessp,
 					   dns_handler, sess);
 	}
 	else {
-		tmr_start(&sess->tmr_async, 1, tmr_async_handler, sess);
+		tmr_start(&sess->tmr_async, 2000, tmr_async_handler, sess);
 	}
 
  out:
