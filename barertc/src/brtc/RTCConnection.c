@@ -244,11 +244,11 @@ static void createRoom_callback(struct FRTCConnection* conn, char* data) {
     uart_printf("%s: is ok\n", __func__);
 }
 
-static void subscriberCreateHandle_callback(struct FRTCConnection* conn, char* data) {
+static void subscriberCreateHandle_callback(struct FRTCConnection* conn, char* data, size_t len) {
 
     JSONStatus_t result = JSONSuccess;
     char* buf = data;
-    size_t bufLength = strlen(data);
+    size_t bufLength = len;
     char handleIdQuery[] = "data.id";
     size_t hidqLength = strlen(handleIdQuery);
     char* handleIdValue = NULL;
@@ -278,7 +278,7 @@ static void subscriberCreateHandle_callback(struct FRTCConnection* conn, char* d
     uart_printf("%s: is ok\n", __func__);
 }
 
-static void RtcJanusTransaction_onError(struct FRTCConnection* conn, char* data) {
+static void RtcJanusTransaction_onError(struct FRTCConnection* conn, char* data, size_t len) {
 }
 
 static void onEvent(struct FRTCConnection* conn, char* data, size_t len) {
@@ -651,7 +651,7 @@ static void onRTCMessage(struct FRTCConnection* conn, const char* data, size_t l
         for (i = 0; i < RTC_JANUS_TRANSACTION_MAP_LEN; i++) {
             if (!strncmp(conn->mJanusTransactionMap[i].jtId, transValue, tvLength)) {
                 RtcJanusTransaction* jt = conn->mJanusTransactionMap[i].jt;
-                jt->onSuccess(conn, data);
+                jt->onSuccess(conn, data, len);
                 strcpy(conn->mJanusTransactionMap[i].jtId, "");
                 free(jt);
                 jt = NULL;
@@ -663,7 +663,7 @@ static void onRTCMessage(struct FRTCConnection* conn, const char* data, size_t l
             if (!strncmp(conn->mJanusTransactionMap[j].jtId, transValue, tvLength)) {
                 RtcJanusTransaction* jt = conn->mJanusTransactionMap[j].jt;
                 if (jt) {
-                    jt->onError(conn, data);
+                    jt->onError(conn, data, len);
                     strcpy(conn->mJanusTransactionMap[j].jtId, "");
                     free(jt);
                     jt = NULL;

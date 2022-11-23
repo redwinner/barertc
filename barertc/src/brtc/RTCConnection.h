@@ -20,8 +20,8 @@ enum {
 };
 
 struct FRTCConnection;
-typedef void(*OnTransactionSuccess)(struct FRTCConnection* conn, char* data);
-typedef void(*OnTransactionError)(struct FRTCConnection* conn, char* data);
+typedef void(*OnTransactionSuccess)(struct FRTCConnection* conn, char* data, size_t len);
+typedef void(*OnTransactionError)(struct FRTCConnection* conn, char* data, size_t len);
 
 typedef struct RtcJanusTransaction {
     char transactionId[RTC_JANUS_TRANSACTION_ID_LEN];
