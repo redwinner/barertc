@@ -28,6 +28,9 @@ struct peer_connection {
 	peerconnection_close_h *closeh;
 	void *arg;
 
+    struct tmr ice_tmr;
+    int ice_retry_times;
+
 	/* steps: */
 	bool gather_ok;
 	bool sdp_enc_ok;
@@ -322,6 +325,7 @@ int peerconnection_new(struct peer_connection **pcp,
 	pc->stream_prm.use_rtp = true;
 	pc->stream_prm.af      = sa_af(&laddr);
 	pc->stream_prm.cname   = pc->cname;
+	pc->ice_retry_times = 0;
 
 	err = sdp_session_alloc(&pc->sdp, &laddr);
 	if (err)
@@ -633,6 +637,13 @@ int peerconnection_start_ice(struct peer_connection *pc)
 
 	if (!pc->sdp_dec_ok) {
 		warning("peerconnection: ice: sdp not ready\n");
+
+        if (pc->ice_retry_times < 10) {
+            pc->ice_retry_times ++;
+            warning("peerconnection: ice: start retry %d in tmr\n", pc->ice_retry_times);
+            tmr_start(&pc->ice_tmr, 500, peerconnection_start_ice, pc);
+            return 0;
+        }
 		return EPROTO;
 	}
 
