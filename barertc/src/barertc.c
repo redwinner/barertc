@@ -35,6 +35,7 @@ static char roomname[30] = "2131";
 static char userid[20] = "10001";
 static char display[30] = "BRTC RTOS V3.0 demo";
 static char token[60] = "no_token";
+static int  autopublish = 1;
 
 static char brtcserver[125] = "ws://rtc.exp.bcelive.com:8186/janus"; // "wss://rtc.exp.bcelive.com/janus"
                                                         // or "ws://183.194.218.96:8188/janus";
@@ -87,7 +88,7 @@ static int brtc_cmd_handler(char obj, const char *d)
             brtc_set_server_url(gBrtcClient, brtcserver);
             brtc_set_appid(gBrtcClient, appid);
 
-            brtc_set_auto_publish(gBrtcClient, 1);
+            brtc_set_auto_publish(gBrtcClient, autopublish);
 			brtc_set_auto_subscribe(gBrtcClient, 1);
             if (ret) {
                 printf("brtc_init_sdk success\n");
@@ -527,6 +528,11 @@ static void http_req_handler(struct http_conn *conn,
                     if (i > 10) {
                        if (!strncmp(&data.p[i - 11], "displayname", 11)) {
                            str_ncpy(display, &data.p[i + 1], 29);
+                       }
+                    }
+                    if (i > 13) {
+                       if (!strncmp(&data.p[i - 14], "no_autopublish", 14)) {
+                           autopublish = 0;
                        }
                     }
                 }
