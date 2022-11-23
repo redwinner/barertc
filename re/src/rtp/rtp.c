@@ -305,7 +305,7 @@ int rtp_listen(struct rtp_sock **rsp, int proto, const struct sa *ip,
 	struct rtp_sock *rs;
 	int err;
 
-	if (!ip || min_port >= max_port || !recvh)
+	if (!ip || min_port > max_port || !recvh)
 		return EINVAL;
 
 	err = rtp_alloc(&rs);

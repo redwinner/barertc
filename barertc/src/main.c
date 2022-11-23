@@ -180,6 +180,8 @@ int main_barertc(int argc, char *argv[])
 
 	/* override default config */
 	config->avt.rtcp_mux = true;
+	config->avt.rtp_ports.min = 8000;
+	config->avt.rtp_ports.max = 9000;
 
 	err = barertcdemo_init(ice_server, stun_user, stun_pass, http_port);
 	if (err) {
