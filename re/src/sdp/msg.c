@@ -369,7 +369,7 @@ int sdp_decode(struct sdp_session *sess, struct mbuf *mb, bool offer)
 }
 
 
-static int media_encode(const struct sdp_media *m, struct mbuf *mb, bool offer)
+static int media_encode(const struct sdp_media *m, struct mbuf *mb, bool offer, int mid)
 {
 	enum sdp_bandwidth i;
 	const char *proto;
@@ -469,7 +469,7 @@ static int media_encode(const struct sdp_media *m, struct mbuf *mb, bool offer)
 
 	err |= mbuf_printf(mb, "a=%s\r\n",
 			   sdp_dir_name(offer ? m->ldir : m->ldir & m->rdir));
-	err |= mbuf_printf(mb, "a=mid:0\r\n");
+	err |= mbuf_printf(mb, "a=mid:%d\r\n", mid);
 
 	for (le = m->lattrl.head; le; le = le->next)
 		err |= mbuf_printf(mb, "%H", sdp_attr_print, le->data);
@@ -496,7 +496,8 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 	enum sdp_bandwidth i;
 	struct mbuf *mb;
 	struct le *le, *le2;
-	int err;
+	int err = 0;
+	int mid = 0;
 
 	if (!mbp || !sess)
 		return EINVAL;
@@ -521,7 +522,7 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 	}
 
 	err |= mbuf_write_str(mb, "t=0 0\r\n");
-	err |= mbuf_write_str(mb, "a=group:BUNDLE 0\r\n");
+	err |= mbuf_write_str(mb, "a=group:BUNDLE 0 1\r\n");
 	err |= mbuf_write_str(mb, "a=msid-semantic: WMS\r\n");
 
 	for (le=sess->lmedial.head; offer && le;) {
@@ -541,7 +542,7 @@ int sdp_encode(struct mbuf **mbp, struct sdp_session *sess, bool offer)
 
 		struct sdp_media *m = le->data;
 
-		err |= media_encode(m, mb, offer);
+		err |= media_encode(m, mb, offer, mid++);
 		for (le2 = sess->lattrl.head; le2; le2 = le2->next)
 			err |= mbuf_printf(mb, "%H", sdp_attr_print, le2->data);
 	}
