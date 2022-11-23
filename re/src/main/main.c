@@ -696,14 +696,16 @@ void fd_close(int fd)
  */
 static int fd_poll(struct re *re)
 {
-	const uint64_t to = tmr_next_timeout(&re->tmrl);
+	uint64_t to = tmr_next_timeout(&re->tmrl);
 	int i, n, index;
 #ifdef HAVE_SELECT
 	fd_set rfds, wfds, efds;
 #endif
 
 	DEBUG_INFO("next timer: %llu ms\n", to);
-
+    if (to > 300) {
+        to = 300;
+    }
 	/* Wait for I/O */
 	switch (re->method) {
 
