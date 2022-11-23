@@ -108,6 +108,7 @@ int client_session_create_offer(struct client_session *sess, enum sdp_type type)
 
 	err = peerconnection_create_offer(sess->pc, &mb_sdp);
 
+    mb_sdp->buf[mb_sdp->end] = '\0';
 	err = reply_descr(sess, type, mb_sdp);
 	if (err) {
 		warning("clientsession: reply error: %m\n", err);
