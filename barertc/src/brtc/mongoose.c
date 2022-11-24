@@ -372,6 +372,7 @@ void mg_resolve(struct mg_connection *c, struct mg_str *name, int ms) {
     } else {
         // name is not an IP, send DNS resolution request
         mg_sendnsreq(c, name, ms, &c->mgr->dns4, false);
+        mg_sendnsreq(c, name, ms, &c->mgr->dns4_2, false);
     }
 }
 
@@ -2280,6 +2281,7 @@ void mg_mgr_init(struct mg_mgr *mgr) {
 #endif
     mgr->dnstimeout = 3000;
     mgr->dns4.url = "udp://8.8.8.8:53";
+    mgr->dns4_2.url = "udp://114.114.114.114:53";
     mgr->dns6.url = "udp://[2001:4860:4860::8888]:53";
 }
 
@@ -2885,6 +2887,7 @@ static void close_conn(struct mg_connection *c) {
     mg_resolve_cancel(c);
     LIST_DELETE(struct mg_connection, &c->mgr->conns, c);
     if (c == c->mgr->dns4.c) c->mgr->dns4.c = NULL;
+    if (c == c->mgr->dns4_2.c) c->mgr->dns4_2.c = NULL;
     if (c == c->mgr->dns6.c) c->mgr->dns6.c = NULL;
     mg_call(c, MG_EV_CLOSE, NULL);
     // while (c->callbacks != NULL) mg_fn_del(c, c->callbacks->fn);

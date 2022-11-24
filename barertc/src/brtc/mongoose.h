@@ -700,6 +700,7 @@ struct mg_addr {
 struct mg_mgr {
   struct mg_connection *conns;  // List of active connections
   struct mg_dns dns4;           // DNS for IPv4
+  struct mg_dns dns4_2;         // DNS for IPv4
   struct mg_dns dns6;           // DNS for IPv6
   int dnstimeout;               // DNS resolve timeout in milliseconds
   unsigned long nextid;         // Next connection ID
