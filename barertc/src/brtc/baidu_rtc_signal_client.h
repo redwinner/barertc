@@ -213,6 +213,10 @@ typedef struct BaiduRtcClient {
 
 BaiduRtcClient* createClient();
 
+int baidu_rtc_signal_timer_poll(BaiduRtcClient* client);
+int baidu_rtc_signal_keepalive(BaiduRtcClient* client);
+int baidu_rtc_signal_keepalive_check_result(BaiduRtcClient* client);
+
 #ifdef __cplusplus
 }
 #endif

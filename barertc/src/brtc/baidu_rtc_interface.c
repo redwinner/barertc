@@ -109,6 +109,27 @@ void brtc_set_auto_subscribe(void* rtc_client, int auto_subscribe) {
     }
 }
 
+void brtc_keepalive(void* rtc_client) {
+    BaiduRtcClient* client = (BaiduRtcClient*)rtc_client;
+    if (client) {
+        baidu_rtc_signal_keepalive(client);
+    }
+}
+
+void brtc_keepalive_check_result(void* rtc_client) {
+    BaiduRtcClient* client = (BaiduRtcClient*)rtc_client;
+    if (client) {
+        baidu_rtc_signal_keepalive_check_result(client);
+    }
+}
+
+void brtc_timer_poll(void* rtc_client) {
+    BaiduRtcClient* client = (BaiduRtcClient*)rtc_client;
+    if (client) {
+        baidu_rtc_signal_timer_poll(client);
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif

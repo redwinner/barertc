@@ -579,6 +579,36 @@ void keepAlive_thread(void* arg) {
     uart_printf("keepAlive_thread exit 0\n");
 }
 
+int baidu_rtc_signal_timer_poll(BaiduRtcClient* client) {
+    if (client && client->mFRTCconn && client->mFRTCconn->mWSCtx) {
+        brtc_websocket_timer_poll(client->mFRTCconn->mWSCtx, TIMER_POLL);
+    }
+    return 0;
+}
+
+int baidu_rtc_signal_keepalive(BaiduRtcClient* client) {
+    if (client && client->mFRTCconn && client->mFRTCconn->mWSCtx) {
+        if (!client->mFRTCconn->mbAliving) {
+            client->mFRTCconn->mObserver->onRTCConnectError(client->mFRTCconn->mObserver->handle);
+            client->mFRTCconn->mObserver->onCirrusDisconnected(client->mFRTCconn->mObserver->handle);
+            return 1;
+        }
+
+        client->mFRTCconn->mbAliving = false;
+        client->mFRTCconn->keepAlive(client->mFRTCconn);
+    }
+}
+
+int baidu_rtc_signal_keepalive_check_result(BaiduRtcClient* client) {
+    if (client && client->mFRTCconn && client->mFRTCconn->mWSCtx) {
+        if (!client->mFRTCconn->mbAliving) {
+            client->mFRTCconn->mObserver->onRTCConnectError(client->mFRTCconn->mObserver->handle);
+            client->mFRTCconn->mObserver->onCirrusDisconnected(client->mFRTCconn->mObserver->handle);
+            return 1;
+        }
+    }
+}
+
 static bool init(struct BaiduRtcClient* client) {
     int err = 0;
     if (!client) {
@@ -731,9 +761,9 @@ bool loginRoom(struct BaiduRtcClient* client, const char* roomName, const char* 
 
     client->mFRTCconn->connecting(client->mFRTCconn, client->mMediaServerURL);
 
-    pthread_t myThread1;
+    // pthread_t myThread1;
     // usleep(500);
-    pthread_create(&myThread1, NULL, keepAlive_thread, client);
+    // pthread_create(&myThread1, NULL, keepAlive_thread, client);
 
     // if (sipInit == 0) {
     //     err = brtc_connect_sip(client->mRoomName, client->mUserId, client->mParamSettings.HasVideo?1:0);

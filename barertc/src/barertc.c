@@ -69,6 +69,42 @@ static void OnRtcMessage(RtcMessage* msg)
     printf("OnRtcMessage %d\r\n", msg->msgType);
 }
 
+static struct tmr keepalive_check_tmr = {0};
+static struct tmr keepalive_tmr = {0};
+static struct tmr poll_tmr = {0};
+
+static void do_keepalive_check_result(void *h)
+{
+    brtc_keepalive_check_result(h);
+}
+
+static void do_keepalive(void *h)
+{
+    brtc_keepalive(h);
+    tmr_start(&keepalive_tmr, 25000, do_keepalive, h);
+    tmr_start(&keepalive_check_tmr, 5000, do_keepalive_check_result, h);
+}
+
+static void do_signal_poll(void *h)
+{
+    brtc_timer_poll(h);
+    tmr_start(&poll_tmr, 50, do_signal_poll, h);
+}
+
+static void start_brtc_tmrs(void *client)
+{
+    tmr_start(&keepalive_tmr, 25000, do_keepalive, client);
+    tmr_start(&poll_tmr, 50, do_signal_poll, client);
+}
+
+static void stop_brtc_tmrs()
+{
+    tmr_cancel(&keepalive_tmr);
+    tmr_cancel(&poll_tmr);
+    tmr_cancel(&keepalive_check_tmr);
+}
+
+
 static int brtc_cmd_handler(char obj, const char *d)
 {
     bool ret = false;
@@ -101,6 +137,7 @@ static int brtc_cmd_handler(char obj, const char *d)
         if (gBrtcClient) {
             ret = brtc_login_room(gBrtcClient, roomname, userid, display, token);
             if (ret) {
+                start_brtc_tmrs(gBrtcClient);
                 printf("brtc_login_room success\n");
             } else {
                 printf("brtc_login_room failed\n");
@@ -108,6 +145,7 @@ static int brtc_cmd_handler(char obj, const char *d)
         }
     } else if(obj == 'o') {
         if (gBrtcClient) {
+            stop_brtc_tmrs();
             ret = brtc_logout_room(gBrtcClient);
             if (ret) {
                 printf("logout room success\r\n");
@@ -717,6 +755,7 @@ void barertcdemo_close(void)
 {
 	list_flush(&sessl);
 
+    stop_brtc_tmrs();
 	conn_pending = mem_deref(conn_pending);
 	httpssock = mem_deref(httpssock);
 	httpsock = mem_deref(httpsock);

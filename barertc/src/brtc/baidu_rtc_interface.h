@@ -26,6 +26,10 @@ void brtc_start_publish(void* rtc_client);
 void brtc_set_auto_publish(void* rtc_client, int auto_publish);
 void brtc_set_auto_subscribe(void* rtc_client, int auto_subscribe);
 
+void brtc_keepalive(void* rtc_client);
+void brtc_timer_poll(void* rtc_client);
+void brtc_keepalive_check_result(void* rtc_client);
+
 #ifdef __cplusplus
 }
 #endif
