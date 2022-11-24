@@ -613,6 +613,7 @@ static void onRTCFailure(struct FRTCConnection* conn) {
 
 static void onRTCOpen(struct FRTCConnection* conn) {
     conn->mRTCConnected = true;
+    conn->mbAliving = true;
     conn->mObserver->onRTCLoginOK(conn->mObserver->handle);
     conn->createSession(conn);
 }
